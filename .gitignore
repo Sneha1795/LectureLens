@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+backend/uploads/
+*.mp4
+*.mp3
+*.wav
+*.m4a
+.env
+node_modules/
+frontend/build/
