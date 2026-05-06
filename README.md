@@ -1,13 +1,18 @@
 # LectureLens
-LectureLens is a web-based application that helps students revise lectures efficiently by converting lecture videos or audio into readable transcripts and concise summaries.
+
+LectureLens is a web application that converts lecture audio/video into transcripts, summaries, and structured study notes — helping students revise more efficiently.
+
 ## Features
-- Converts lecture audio/video into text transcripts  
-- Generates concise summaries for quick revision  
-- Chatbot to interact with lecture content  
-- Quiz feature to test understanding  
+- Converts lecture audio/video into timestamped transcripts
+- Generates concise summaries for quick revision
+- Keyword extraction linked to transcript timestamps for navigation
+- Chatbot to interact with lecture content
+- Quiz feature to test understanding
+- Export notes as a Word document for offline access
 
 ## Tech Stack
-- Frontend: React.js  
-- Backend: Node.js  
-- APIs: Speech-to-Text API, NLP APIs  
-- Language: JavaScript  
+- **Frontend:** React.js, Tailwind CSS
+- **Backend:** FastAPI, Python
+- **APIs:** Groq API (Whisper for speech-to-text, LLaMA for summarization)
+- **NLP:** YAKE keyword extraction
+ 
