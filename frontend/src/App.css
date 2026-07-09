@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+
+/* Custom interactive hover styles to replace brittle inline event handlers */
+.hover-bg-segment {
+  transition: background-color 0.15s ease-in-out;
+}
+.hover-bg-segment:hover {
+  background-color: #fafafa;
+}
+
+.hover-border-zone {
+  border-color: #ccc;
+}
+.hover-border-zone:hover {
+  border-color: #888;
+}

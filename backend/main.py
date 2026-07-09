@@ -1,3 +1,9 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables first before importing modules that depend on them
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routes.upload import router as upload_router
@@ -8,9 +14,11 @@ from backend.routes.export import router as export_router
 
 app = FastAPI(title="LectureLens API")
 
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
