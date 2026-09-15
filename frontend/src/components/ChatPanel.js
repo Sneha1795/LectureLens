@@ -16,10 +16,8 @@ export default function ChatPanel({ chatHistory, question, setQuestion, loadingC
   }, [chatHistory, loadingChat]);
 
   return (
-    <div style={{ width: 300, display: "flex", flexDirection: "column", padding: "24px 20px", borderLeft: "1px solid #e8e8e8" }}>
-      <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Chat Assistant</p>
-
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, height: "100%", minHeight: 0 }}>
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, marginBottom: 16, paddingRight: 4 }}>
         {chatHistory.map((msg, i) => {
           const isUser = msg.role === "user";
           const isGreeting = msg.isGreeting;

@@ -55,14 +55,14 @@ export default function TranscriptPanel({ transcript, jumpTo, mediaRef }) {
   );
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", flex: 1, minHeight: 0 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <p style={{ fontSize: 14, fontWeight: 600 }}>Full Transcript</p>
+        <p style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Full Transcript</p>
         <input type="text" placeholder="Search transcript..." value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ border: "1px solid #e0e0e0", borderRadius: 8, padding: "6px 12px", fontSize: 12, outline: "none", width: 180 }} />
       </div>
-      <div style={{ display: "flex", flexDirection: "column", maxHeight: "400px", overflowY: "auto", paddingRight: 4 }}>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto", paddingRight: 4 }}>
         {filtered.length === 0 ? (
           <p style={{ color: "#aaa", fontSize: 13 }}>No results found.</p>
         ) : (

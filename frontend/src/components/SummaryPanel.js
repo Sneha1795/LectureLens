@@ -12,8 +12,8 @@ export default function SummaryPanel({ summary, summarySize, setSummarySize, han
   };
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, height: "100%", minHeight: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexShrink: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 600 }}>Summary & Notes</p>
         <div style={{ display: "flex", gap: 6 }}>
           {["short", "medium", "long"].map((size) => (
@@ -25,7 +25,7 @@ export default function SummaryPanel({ summary, summarySize, setSummarySize, han
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexShrink: 0 }}>
         <button onClick={() => handleSummary(fullText)} disabled={loadingSummary}
           style={{ background: "#111", color: "#fff", border: "none", borderRadius: 8, padding: "10px 22px", fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
           {loadingSummary ? "Generating..." : "Generate Summary"}
@@ -43,8 +43,10 @@ export default function SummaryPanel({ summary, summarySize, setSummarySize, han
       </div>
 
       {summary && (
-        <div style={{ background: "#fafafa", border: "1px solid #e8e8e8", borderRadius: 10, padding: 20, fontSize: 13, color: "#333", lineHeight: 1.8 }}>
-          {parseSummaryToReact(summary)}
+        <div style={{ flex: 1, overflowY: "auto", minHeight: 0, paddingRight: 4 }}>
+          <div style={{ background: "#fafafa", border: "1px solid #e8e8e8", borderRadius: 10, padding: 20, fontSize: 13, color: "#333", lineHeight: 1.8 }}>
+            {parseSummaryToReact(summary)}
+          </div>
         </div>
       )}
     </div>

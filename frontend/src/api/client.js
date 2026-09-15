@@ -20,7 +20,7 @@ try {
   // Ignore reference errors
 }
 
-const BASE_URL = baseUrl;
+export const BASE_URL = baseUrl;
 
 export async function fetchApi(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;

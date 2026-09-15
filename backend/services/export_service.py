@@ -65,22 +65,8 @@ def generate_pdf(filename: str, full_text: str, keywords: list, summary: str, tr
         pdf.cell(0, 10, "Key Topics", new_x="LMARGIN", new_y="NEXT")
         pdf.set_font("DejaVuSans", "", 10)
         for kw in keywords:
-            minutes = int(kw["timestamp"] // 60)
-            seconds = int(kw["timestamp"] % 60)
-            time_str = f"{minutes:02d}:{seconds:02d}"
-            pdf.cell(0, 6, f"- {kw['keyword']}  [{time_str}]", new_x="LMARGIN", new_y="NEXT")
+            pdf.cell(0, 6, f"- {kw['keyword']}", new_x="LMARGIN", new_y="NEXT")
         pdf.ln(5)
-
-    # Transcript Section
-    if transcript:
-        pdf.set_font("DejaVuSans", "B", 12)
-        pdf.cell(0, 10, "Transcript", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("DejaVuSans", "", 10)
-        for seg in transcript:
-            minutes = int(seg["start"] // 60)
-            seconds = int(seg["start"] % 60)
-            time_str = f"{minutes:02d}:{seconds:02d}"
-            pdf.multi_cell(0, 6, f"[{time_str}] {seg['text']}")
 
     pdf_bytes = pdf.output()
     return BytesIO(pdf_bytes)
@@ -106,20 +92,7 @@ def generate_docx(filename: str, full_text: str, keywords: list, summary: str, t
     if keywords:
         doc.add_heading("Key Topics", level=1)
         for kw in keywords:
-            minutes = int(kw["timestamp"] // 60)
-            seconds = int(kw["timestamp"] % 60)
-            time_str = f"{minutes:02d}:{seconds:02d}"
-            doc.add_paragraph(f"• {kw['keyword']}  [{time_str}]")
-        doc.add_paragraph("")
-
-    # Transcript Section
-    if transcript:
-        doc.add_heading("Transcript", level=1)
-        for seg in transcript:
-            minutes = int(seg["start"] // 60)
-            seconds = int(seg["start"] % 60)
-            time_str = f"{minutes:02d}:{seconds:02d}"
-            doc.add_paragraph(f"[{time_str}] {seg['text']}")
+            doc.add_paragraph(f"• {kw['keyword']}")
         doc.add_paragraph("")
 
     # Save document in memory to prevent local write and path traversal security vulnerabilities

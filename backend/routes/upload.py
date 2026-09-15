@@ -3,6 +3,9 @@ import uuid
 import logging
 import threading
 import anyio
+import re
+
+UUID_REGEX = re.compile(r"^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from pydub import AudioSegment
 from backend.services.whisper_service import transcribe_audio
@@ -62,7 +65,8 @@ async def process_upload_task(job_id: str, file_path: str, audio_path: str, ext:
         job_result = {
             "transcript": result["transcript"],
             "full_text": result["full_text"],
-            "keywords": keywords_with_timestamps
+            "keywords": keywords_with_timestamps,
+            "filename": filename
         }
         update_job(job_id, "done", result=job_result)
 
@@ -71,13 +75,8 @@ async def process_upload_task(job_id: str, file_path: str, audio_path: str, ext:
         update_job(job_id, "failed", error=str(e))
 
     finally:
-        # Guarantee cleanup of physical media files from server storage
-        if file_path:
-            try:
-                if await anyio.to_thread.run_sync(os.path.exists, file_path):
-                    await anyio.to_thread.run_sync(os.remove, file_path)
-            except OSError as e:
-                logger.error(f"Failed to delete original file {file_path}: {e}")
+        # Guarantee cleanup of temporary converted WAV files from server storage
+        # We preserve the original file_path so it can be streamed/downloaded on revisit
         if audio_path and audio_path != file_path:
             try:
                 if await anyio.to_thread.run_sync(os.path.exists, audio_path):
@@ -143,8 +142,26 @@ async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File
 
 @router.get("/upload/status/{job_id}")
 async def get_upload_status(job_id: str):
+    if not UUID_REGEX.match(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format")
     with jobs_lock:
         job = jobs.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+@router.get("/media/{job_id}")
+async def get_media(job_id: str):
+    if not UUID_REGEX.match(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format")
+    if not os.path.exists(UPLOAD_DIR):
+        raise HTTPException(status_code=404, detail="Upload directory not found")
+    
+    for filename in os.listdir(UPLOAD_DIR):
+        name, ext = os.path.splitext(filename)
+        if name == job_id:
+            file_path = os.path.join(UPLOAD_DIR, filename)
+            from fastapi.responses import FileResponse
+            return FileResponse(file_path)
+            
+    raise HTTPException(status_code=404, detail="Media file not found")

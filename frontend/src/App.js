@@ -1,13 +1,44 @@
-import { useRef } from "react";
-import UploadView from "./components/UploadView";
+import { useRef, useEffect } from "react";
+import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import ResultsView from "./components/ResultsView";
+import UploadView from "./components/UploadView";
 import { useLectureUpload } from "./hooks/useLectureUpload";
 import { useSummary } from "./hooks/useSummary";
 import { useChat } from "./hooks/useChat";
 import { useExport } from "./hooks/useExport";
 
+// A wrapper to handle loading by ID from the route params
+function ResultsRouteWrapper({
+  loadJobById,
+  transcript,
+  jobId,
+  setJobId,
+  ...props
+}) {
+  const { jobId: urlJobId } = useParams();
+
+  useEffect(() => {
+    if (urlJobId && urlJobId !== jobId) {
+      loadJobById(urlJobId).catch((err) => {
+        console.error("Failed to load job:", err);
+      });
+    }
+  }, [urlJobId, jobId, loadJobById]);
+
+  return (
+    <ResultsView
+      {...props}
+      transcript={transcript}
+    />
+  );
+}
+
 export default function App() {
+  const navigate = useNavigate();
+
   const {
+    jobId,
+    setJobId,
     file,
     uploading,
     error: uploadError,
@@ -22,6 +53,7 @@ export default function App() {
     handleFileChange,
     handleUpload,
     resetUpload,
+    loadJobById,
   } = useLectureUpload();
 
   const {
@@ -56,6 +88,13 @@ export default function App() {
   // Combine error displays
   const activeError = uploadError || summaryError || chatError || exportError;
 
+  // Navigate to results page when jobId is updated from a successful upload
+  useEffect(() => {
+    if (jobId) {
+      navigate(`/results/${jobId}`);
+    }
+  }, [jobId, navigate]);
+
   const jumpTo = (seconds) => {
     if (mediaRef.current) {
       mediaRef.current.currentTime = seconds;
@@ -69,6 +108,7 @@ export default function App() {
     setSummaryError("");
     setChatError("");
     setExportError("");
+    navigate("/");
   };
 
   const onDownloadNotes = () => {
@@ -79,42 +119,57 @@ export default function App() {
     handleDownloadPdf(filename, fullText, keywords, summary, transcript);
   };
 
-  if (!transcript.length) {
-    return (
-      <UploadView
-        file={file}
-        uploading={uploading}
-        error={activeError}
-        handleFileChange={handleFileChange}
-        handleUpload={handleUpload}
-      />
-    );
-  }
-
   return (
-    <ResultsView
-      filename={filename}
-      uploadDate={uploadDate}
-      mediaUrl={mediaUrl}
-      mediaType={mediaType}
-      mediaRef={mediaRef}
-      keywords={keywords}
-      transcript={transcript}
-      fullText={fullText}
-      jumpTo={jumpTo}
-      summary={summary}
-      summarySize={summarySize}
-      setSummarySize={setSummarySize}
-      handleSummary={handleSummary}
-      loadingSummary={loadingSummary}
-      chatHistory={chatHistory}
-      question={question}
-      setQuestion={setQuestion}
-      loadingChat={loadingChat}
-      handleChat={handleChat}
-      handleDownloadDocx={onDownloadNotes}
-      handleDownloadPdf={onDownloadPdf}
-      onBack={handleBack}
-    />
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <UploadView
+            file={file}
+            uploading={uploading}
+            error={activeError}
+            handleFileChange={handleFileChange}
+            handleUpload={handleUpload}
+          />
+        }
+      />
+      <Route
+        path="/results/:jobId"
+        element={
+          <ResultsRouteWrapper
+            loadJobById={loadJobById}
+            jobId={jobId}
+            setJobId={setJobId}
+            filename={filename}
+            uploadDate={uploadDate}
+            mediaUrl={mediaUrl}
+            mediaType={mediaType}
+            mediaRef={mediaRef}
+            keywords={keywords}
+            transcript={transcript}
+            fullText={fullText}
+            jumpTo={jumpTo}
+            summary={summary}
+            summarySize={summarySize}
+            setSummarySize={setSummarySize}
+            handleSummary={handleSummary}
+            loadingSummary={loadingSummary}
+            chatHistory={chatHistory}
+            question={question}
+            setQuestion={setQuestion}
+            loadingChat={loadingChat}
+            handleChat={handleChat}
+            handleDownloadDocx={onDownloadNotes}
+            handleDownloadPdf={onDownloadPdf}
+            onBack={handleBack}
+            file={file}
+            uploading={uploading}
+            error={activeError}
+            handleFileChange={handleFileChange}
+            handleUpload={handleUpload}
+          />
+        }
+      />
+    </Routes>
   );
 }
